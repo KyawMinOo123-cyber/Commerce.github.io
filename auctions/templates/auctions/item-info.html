@@ -1,0 +1,91 @@
+{% extends 'auctions/layout.html' %}
+
+{% block body %}
+    <!-- error message -->
+    {% if message %}
+        <h2 class="text-danger mt-3 mb-3">{{message}}</h2>
+    {% endif %}
+    <!-- success message -->
+    {% if success %}
+        <h2 class="text-success mt-3 mb-3">{{success}}</h2>
+    {% endif %}
+    <!-- won-item is the message text for item winner -->
+    {% if won_item %}
+        <div class="won-item d-flex align-items-center justify-content-between">
+            <h2 class="text-success d-inline">{{won_item}}</h2> <span class="ms-5"><a href="{% url 'delete-auction' item.id %}" class="btn btn-primary me-3">Get The Product</a></span>
+        </div>
+    {% endif %}
+    <div class="card">
+        <div class="card-header">
+            <h3>{{item.title}}</h3>
+        </div>
+
+        <div class="card-img">
+            <img src="{{item.img_url}}" alt="{{item.title}}" width="100%">
+        </div>
+
+        <div class="card-body">
+            <h6 class="d-inline me-3">Price:</h6><span>${{item.price}}</span>              
+            <h6>Description</h6>
+            <!-- Full description content will display here  -->
+            <p class="ps-3">{{item.description}}</p>
+        
+            <h6 class="d-inline me-3">Listed at:</h6><span>{{item.formatted_listing_date}}</span> <br>
+            <h6 class="d-inline me-3">Listed by:</h6><span>{{item.creator.username|title}}</span> <br>
+
+            <h6 class="d-inline me-3">Category:</h6>
+            <!-- check the auction is in a category -->
+            {% if item.categories.all %}
+                {% for category in item.categories.all %}
+                <span>{{ category.name }}</span>
+                {% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            {% else %}
+            <span>- - -</span>
+            {% endif %}
+
+            <!-- showing current bids if exists -->
+                {% if item.current_bids.all %}
+                    <h6 class="mt-3 mb-3 border-top">Current Bids</h6>
+                    {% for bid in item.current_bids.all %}
+                        <p class="border-bottom ms-3"> - {{bid.bidder.username|title}}: ${{bid.amount}}</p>
+                    {% endfor %}
+                {% endif %}
+                
+            <!-- Can add comment or place-bids if user is loged in -->
+            {% if user.is_authenticated %}
+                <!-- form for plece-bid -->
+                <!-- item creator cannot place bids -->
+                {% if request.user != item.creator %}
+                <form action="{% url 'place-bid' item.id %}" method="POST" class="border-bottom">
+                    {% csrf_token %}
+                    <input type="text" pattern="\d*" class="form-control mt-3 mb-3" maxlength="8" name="bid-input" placeholder="Enter your bid..." required>
+                    <input type="submit" class="btn btn-primary mb-3" value="Bid">
+                </form>
+                {% endif %}
+
+                <!-- Add comment form -->
+                <form action="{% url 'add-comment' item.id %}" method="POST" class="mt-3">
+                    {% csrf_token %}
+                    <h6 class="mt-3">Add Comment</h6>
+                    <textarea class="p-3" name="comment" id="comment" cols="50" rows="5" required>
+                    </textarea> <br>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-arrow-right"></i></button>
+                </form>
+            {% endif %}
+
+            <!-- Show existing comments if exists -->
+            {% if item.comments.all %}
+                <h6 class="mt-5 border-top">Comments</h6>
+                {% for comment in item.comments.all%}
+                    <p class="mt-3 border-top p-3">{{comment.comment_text}} <span style="opacity: 0.5;"> By {{comment.commenter.username|title}} at {{comment.timestamp}}</span></p>
+                {% endfor %}
+            {% endif %}
+
+        </div>
+
+        <div class="card-footer">
+            <a href="{% url 'index' %}">Back</a>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <link href="{% static 'auctions/style.css' %}" rel="stylesheet">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+        <title>{% block title %}Cyber Store{% endblock %}</title>
+    </head>
+    <body>
+        <div class="main">
+            <!-- User Name and Login/logout/register buttons -->
+            <h1 class="Logo mb-5 border-bottom text-primary">CYBER <span class="text-dark">STORE</span></h1>
+            <div class="d-flex justify-content-between head-session mt-5 border-bottom">
+                <div class="authenticate">
+                    {% if user.is_authenticated %}
+                            <h5 class="user-name">
+                                <span class="name-display text-wrap bg-primary rounded-end text-light">{{ user.username|title }} </span>
+                            </h5>
+                        <a class="logout-btn nav-link text-danger" href="{% url 'logout' %}">Log Out</a>
+                    {% else %}
+                        <h4 style="text-align: right;"> 
+                            <a style="margin-right: 5px;" href="{% url 'register' %}">
+                                Register
+                            </a> 
+                            | 
+                            <a style="margin-left: 5px;" href="{% url 'login' %}">
+                                log In
+                            </a>
+                        </h4>
+                    {% endif %}
+                </div>
+
+                <!-- navigations buttons -->
+                <ul class="nav">
+                    {% if user.is_staff %}                    
+                    <li class="nav-item-one">
+                        <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+                    </li>
+                    {% endif %}                    
+                    <li class="nav-item-one">
+                        <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'category-list' %}">Category</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'watched-items' %}">Watch List</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'create-auction' %}">Create List</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+            {% block body %}
+            {% endblock %}
+        </div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+        <script src="https://kit.fontawesome.com/43d793ab52.js" crossorigin="anonymous"></script>
+    </body>
+</html>

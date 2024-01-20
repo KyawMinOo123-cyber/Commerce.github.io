@@ -1,0 +1,32 @@
+{% extends 'auctions/layout.html' %}
+
+{% block body %}
+    {% if message %}
+        <h2 class="text-danger"> 
+            {{message}}
+        </h2>
+    {% endif %}
+    
+    {% if alert %}
+        <h1 class="text-warning text-center mt-5" >{{alert}}</h1>
+        <div class="d-flex justify-content-center mt-5">
+            <a href="{% url 'category-list' %}">Create Category</a>
+        </div>
+        
+    {% else %}
+        <h1>Create Auction-Item</h1>
+        <form action="{% url 'create-auction' %}" method="POST">
+            {% csrf_token %}
+            {{form.as_p}}
+            <select name="category-select">
+                {% for category in categories %}
+                    <option value="{{category.id}}">{{category.name}}</option>
+                {% endfor %}
+            </select>
+            <div class="create-page-buttons">
+                <input type="submit" value="Add">
+                <a href="{% url 'index' %}">Cancel</a>
+            </div>
+        </form>
+    {% endif %}
+{% endblock %}
